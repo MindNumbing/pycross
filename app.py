@@ -1,36 +1,41 @@
 import time
 import logging
 
+
 class NonogramSolver(object):
+
+
     def __init__(self, board_size, hints):
         self.board_size = board_size
         self.board = [ [0] * board_size ] * board_size
         self.hints = hints
 
+
     def generate_board(self, board):
         my_list = [int(char) for char in [row for row in board]]
         return [my_list[i * self.board_size:(i + 1) * self.board_size] for i in range((len(my_list) + self.board_size - 1) // self.board_size )]
 
-    def get_column(self, board, col):
-        return [row[col] for row in board]
 
     def check_rows(self, potential_board):
         # For each row in the board
         for i in range(0, len(potential_board)):
             # if the number in the row is larger than the size of the hint for the row
-            if sum(potential_board[i]) > self.hints[0][i]:
+            if sum(potential_board[i]) > sum(self.hints[0][i]):
                 return False
         return True
+
 
     def get_column(self, potential_board, column):
         generated_column = [row[column] for row in potential_board if len(row) > column]
         return generated_column
-    
+
+
     def check_columns(self, potential_board):
         for i in range(0, len(potential_board[0])):
-            if sum(self.get_column(potential_board, i)) > self.hints[1][i]:
+            if sum(self.get_column(potential_board, i)) > sum(self.hints[1][i]):
                 return False
         return True
+
 
     def check(self, potential_solve):
         potential_board = self.generate_board(potential_solve)
@@ -40,6 +45,7 @@ class NonogramSolver(object):
         elif not self.check_columns(potential_board):
             return False
         return True
+
 
     def solve(self):
         self.stack = []
@@ -53,14 +59,16 @@ class NonogramSolver(object):
             if len(current) < self.board_size*self.board_size:
                 self.stack.append(current + "0")
                 self.stack.append(current + "1")
-            if self.generate_board(current) == self.generate_board("0010001110111110111000100"):
-                logging.info("Solved")
+            if self.generate_board(current) == self.generate_board("1010101010101010101010101"):
+                logging.info("Solved!")
+                logging.info("Solved Board:")
+                for row in self.generate_board(current):
+                    logging.info(row)
                 break
 
+logging.basicConfig(format='{%(pathname)s:%(lineno)d} %(levelname)s - %(message)s', filename='nonogram.log', encoding='utf-8', level=logging.INFO)
 
-logging.basAicConfig(filename='nonogram.log', encoding='utf-8', level=logging.INFO)
-
-nono = NonogramSolver(board_size=5, hints=[[1,3,5,3,1],[1,3,5,3,1]])
+nono = NonogramSolver(board_size=5, hints=[[[1,1,1],[1,1],[1,1,1],[1,1],[1,1,1]],[[1,1,1],[1,1],[1,1,1],[1,1],[1,1,1]]])
 
 start = time.time()
 nono.solve()
