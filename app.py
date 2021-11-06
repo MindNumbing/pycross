@@ -1,6 +1,4 @@
-from tqdm import tqdm
-
-pbar = tqdm(total=33554432)
+import time
 
 board = [
     [0, 0, 0, 0, 0],
@@ -53,7 +51,6 @@ def solve():
     while stack:
         current = stack.pop()
         if len(current) == 25:
-            pbar.update(1)
             if check(current):
                 print("Success")
                 solved_board = generate_board(current)
@@ -64,5 +61,7 @@ def solve():
             stack.append(current + "0")
             stack.append(current + "1")
 
+start = time.time()
 solve()
-pbar.close()
+end = time.time()
+print(end - start)
