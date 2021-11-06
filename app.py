@@ -1,5 +1,5 @@
 import time
-
+import logging
 
 class NonogramSolver(object):
 
@@ -15,12 +15,25 @@ class NonogramSolver(object):
         return [my_list[i * self.board_size:(i + 1) * self.board_size] for i in range((len(my_list) + self.board_size - 1) // self.board_size )]
 
 
+    def get_column(self, board, col):
+        return [row[col] for row in board]
+
+
+    def check_rows(self, potential_board):
+        # For each row in the board
+        for i in range(0, len(potential_board)):
+            # if the number in the row is larger than the size of the hint for the row
+            if sum(potential_board[i]) > self.hints[0][i]:
+                return False
+        return True
+
+
     def check(self, potential_solve):
         potential_board = self.generate_board(potential_solve)
-        if potential_board == self.generate_board("0010001110111110111000100"):
-            print("Solved")
-            return True
-        return False
+        # If any of the rows are invalid, return false.
+        if not self.check_rows(potential_board):
+            return False
+        return True
 
 
     def solve(self):
@@ -29,17 +42,18 @@ class NonogramSolver(object):
         self.stack.append("1")
         while self.stack:
             current = self.stack.pop()
-            if len(current) == self.board_size * self.board_size:
-                if self.check(current):
-                    print("Success")
-                    solved_board = self.generate_board(current)
-                    for row in solved_board:
-                        print(row)
-                    break
-            else:
+            # If the current board is invalid, don't add to the stack because this is invalid
+            if not self.check(current):
+                continue
+            if len(current) < self.board_size*self.board_size:
                 self.stack.append(current + "0")
                 self.stack.append(current + "1")
+            if self.generate_board(current) == self.generate_board("0010001110111110111000100"):
+                logging.info("Solved")
+                break
 
+
+logging.basicConfig(filename='nonogram.log', encoding='utf-8', level=logging.INFO)
 
 nono = NonogramSolver(board_size=5, hints=[[1,3,5,3,1],[1,3,5,3,1]])
 
@@ -47,4 +61,4 @@ start = time.time()
 nono.solve()
 end = time.time()
 
-print(end - start)
+logging.info(f"Algorithm took: {end - start} seconds!")
