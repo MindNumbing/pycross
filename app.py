@@ -2,22 +2,17 @@ import time
 import logging
 
 class NonogramSolver(object):
-
-
     def __init__(self, board_size, hints):
         self.board_size = board_size
         self.board = [ [0] * board_size ] * board_size
         self.hints = hints
 
-
     def generate_board(self, board):
         my_list = [int(char) for char in [row for row in board]]
         return [my_list[i * self.board_size:(i + 1) * self.board_size] for i in range((len(my_list) + self.board_size - 1) // self.board_size )]
 
-
     def get_column(self, board, col):
         return [row[col] for row in board]
-
 
     def check_rows(self, potential_board):
         # For each row in the board
@@ -27,14 +22,24 @@ class NonogramSolver(object):
                 return False
         return True
 
+    def get_column(self, potential_board, column):
+        generated_column = [row[column] for row in potential_board if len(row) > column]
+        return generated_column
+    
+    def check_columns(self, potential_board):
+        for i in range(0, len(potential_board[0])):
+            if sum(self.get_column(potential_board, i)) > self.hints[1][i]:
+                return False
+        return True
 
     def check(self, potential_solve):
         potential_board = self.generate_board(potential_solve)
         # If any of the rows are invalid, return false.
         if not self.check_rows(potential_board):
             return False
+        elif not self.check_columns(potential_board):
+            return False
         return True
-
 
     def solve(self):
         self.stack = []
@@ -53,7 +58,7 @@ class NonogramSolver(object):
                 break
 
 
-logging.basicConfig(filename='nonogram.log', encoding='utf-8', level=logging.INFO)
+logging.basAicConfig(filename='nonogram.log', encoding='utf-8', level=logging.INFO)
 
 nono = NonogramSolver(board_size=5, hints=[[1,3,5,3,1],[1,3,5,3,1]])
 
